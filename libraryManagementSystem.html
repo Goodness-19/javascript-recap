@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+</head>
+
+<body>
+    <script>
+        class Book {
+            title;
+            #isBorrowed;
+
+            constructor(title) {
+                this.title = title;
+                this.#isBorrowed = false;
+            }
+
+            borrow() {
+                if (!this.#isBorrowed) {
+                    this.#isBorrowed = true;
+                    this.#logStatus();
+                }
+            }
+
+            returnBook() {
+                if (this.#isBorrowed) {
+                    this.#isBorrowed = false;
+                    this.#logStatus();
+                }
+            }
+
+            getStatus() {
+                return this.#isBorrowed ? "borrowed" : "available";
+            }
+
+            #logStatus() {
+                console.log(`${this.title} is now ${this.getStatus()}`);
+            }
+        }
+
+        class EBook extends Book {
+            fileSizeMB;
+
+            constructor(title, fileSizeMB) {
+                super(title);
+                this.fileSizeMB = fileSizeMB;
+            }
+
+            download() {
+                console.log(`Downloading "${this.title}" (${this.fileSizeMB}MB)`);
+            }
+
+            borrow() {
+                super.borrow();
+                console.log(`"${this.title}" can also be downloaded.`);
+            }
+        }
+
+        class Magazine extends Book {
+            issueNumber;
+
+            constructor(title, issueNumber) {
+                super(title);
+                this.issueNumber = issueNumber;
+            }
+
+            readIssue() {
+                console.log(`Reading issue #${this.issueNumber} of "${this.title}"`);
+            }
+        }
+
+        class DateUtils {
+            static formatDate(date) {
+                const day = String(date.getDate()).padStart(2, "0");
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        }
+
+        class LibraryService {
+            constructor() {
+                this.books = [];
+            }
+
+            addBook(book) {
+                this.books.push(book);
+            }
+
+            listBooks() {
+                return this.books.map(book => ({
+                    title: book.title,
+                    status: book.getStatus()
+                }));
+            }
+        }
+
+        class LibraryController {
+            constructor(libraryService) {
+                this.libraryService = libraryService;
+            }
+
+            addBook(book) {
+                this.libraryService.addBook(book);
+            }
+
+            listBooks() {
+                return this.libraryService.listBooks();
+            }
+        }
+
+        const libraryService = new LibraryService();
+        const libraryController = new LibraryController(libraryService);
+
+        const book1 = new Book("Harry Potter");
+        const ebook1 = new EBook("JavaScript Guide", 5);
+        const magazine1 = new Magazine("Tech Monthly", 42);
+
+        libraryController.addBook(book1);
+        libraryController.addBook(ebook1);
+        libraryController.addBook(magazine1);
+
+        book1.borrow();
+        ebook1.borrow();
+        ebook1.download();
+        magazine1.readIssue();
+
+        console.log(libraryController.listBooks());
+
+    </script>
+</body>
+
+</html>
